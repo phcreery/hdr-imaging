@@ -17,7 +17,7 @@ def hist_equalize(I, numtiles=(8, 8)):
 def maketile_mapping(I, numtiles, tile_size, selected_range, full_range, num_bins=256, norm_clip_limit=0.01):
 
     num_pixel_in_tile = np.prod(tile_size)
-    min_clip_limit = np.ceil(np.float(num_pixel_in_tile) / num_bins)
+    min_clip_limit = np.ceil(float(num_pixel_in_tile) / num_bins)
     clip_limit = min_clip_limit + np.round(norm_clip_limit * (num_pixel_in_tile - min_clip_limit))
 
     tile_mappings = []

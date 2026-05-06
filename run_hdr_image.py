@@ -1,6 +1,5 @@
 import numpy as np
-import os, glob, sys
-import cv2
+import sys
 import matplotlib.pyplot as mp_plt
 from load_images import load_images
 from hdr_debevec import hdr_debevec
@@ -30,10 +29,11 @@ def run_hdr(image_dir, image_ext, root_dir, COMPUTE_CRF, kwargs):
 
   if(COMPUTE_CRF):
     [crf_channel, log_irrad_channel, w] = hdr_debevec(images, B, lambda_=lambda_, num_px=num_px)
-    np.save(root_dir+"crf.npy", [crf_channel, log_irrad_channel, w])
+    # Store heterogeneous payload as object array for newer NumPy versions.
+    np.save(root_dir+"crf.npy", np.array([crf_channel, log_irrad_channel, w], dtype=object), allow_pickle=True)
   else:
     hdr_loc = kwargs['hdr_loc']
-    [crf_channel, log_irrad_channel, w] = np.load(hdr_loc)
+    [crf_channel, log_irrad_channel, w] = np.load(hdr_loc, allow_pickle=True)
   irradiance_map = compute_irradiance(crf_channel, w, images, B)
   tonemapped_img = reinhard_tonemap(irradiance_map, gamma=gamma, alpha=alpha)
   plot_and_save(tonemapped_img, root_dir+image_dir[:-1], "Globally Tonemapped Image")
@@ -44,7 +44,7 @@ if __name__ == "__main__":
   ROOT_DIR = sys.argv[1]
   IMAGE_DIR = sys.argv[2]
   IMAGE_EXT = sys.argv[3]
-  COMPUTE_CRF = sys.argv[4]
+  COMPUTE_CRF = str(sys.argv[4]).strip().lower() in ("true", "1", "yes", "y")
   kwargs = {'lambda_': 50, 'num_px': 150, 'gamma': 1 / 2.2, 'alpha': 0.35, 'hdr_loc':ROOT_DIR+"crf.npy", 
             'gamma_local':1.5, 'saturation_local':2.0}
   hdr_image, irmap = run_hdr(IMAGE_DIR, IMAGE_EXT, ROOT_DIR, COMPUTE_CRF, kwargs)

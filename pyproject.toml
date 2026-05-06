@@ -1,0 +1,11 @@
+[project]
+name = "hdr-imaging"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.9",
+    "np>=1.0.2",
+    "opencv-python>=4.13.0.92",
+]
